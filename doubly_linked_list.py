@@ -16,3 +16,26 @@ class DoublyLinkedList:
 
         self.size +=1
         return new_node
+
+    def unlink(self, node):
+        if node is None:
+            return None
+
+        if node.prev is None and node is not self.head:
+            return None
+            
+        if node.prev is not None:
+            node.prev.next = node.next
+        else:
+            self.head = node.next
+
+        if node.next is not None:
+            node.next.prev = node.prev
+        else:
+            self.tail = node.prev
+
+        node.prev = None
+        node.next = None
+
+        self.size -=1
+        return node
