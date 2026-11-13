@@ -21,7 +21,10 @@ class DoublyLinkedList:
         if node is None:
             return None
 
-        if node.prev is None and node is not self.head:
+        valid_node = self.head
+        while valid_node is not None and valid_node is not node:
+            valid_node = valid_node.next
+        if valid_node is None:
             return None
             
         if node.prev is not None:
@@ -39,3 +42,27 @@ class DoublyLinkedList:
 
         self.size -=1
         return node
+
+    def cut_after(self, node):
+        if self.head is None or node is None:
+            return 0
+
+        valid_node = self.head
+        while valid_node is not None and valid_node is not node:
+            valid_node = valid_node.next
+        if valid_node is None:
+            return 0
+
+        current = node.next
+        removed = 0
+        while current is not None:
+            next_node = current.next
+            current.prev = None
+            current.next = None
+            removed += 1
+            current = next_node
+
+        node.next = None
+        self.tail = node
+        self.size -= removed
+        return removed
