@@ -59,7 +59,7 @@ def run():
                     manager.restore_stack.clear()
                     print(f"History imported from {argument}")
             else:
-                print("I don't know that command. Type 'help' to see the commands.")
+                print("Unknown command. Type 'help' to see the available commands.")
         except (ValueError, OSError) as error:
             print(f"Error: {error}")
 

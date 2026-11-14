@@ -4,11 +4,11 @@
 class HistoryManager:
     def __init__(self, browser_history_instance):
         self.browser = browser_history_instance
-        # Keep each deleted page's neighbors and index for restoration.
+        # Remember where each deleted page was so it can be put back.
         self.restore_stack = []
 
     def display_history(self):
-        """Print the history and return the lines that were shown."""
+        """Print each page, mark the current one, and return the printed lines."""
         rows = []
         node = self.browser.dll.head
         while node is not None:
@@ -61,7 +61,7 @@ class HistoryManager:
 
     def restore_node(self):
         if not self.restore_stack:
-            print("No deleted history to restore.")
+            print("There are no deleted pages to restore.")
             return False
 
         record = self.restore_stack.pop()
@@ -70,7 +70,7 @@ class HistoryManager:
         previous = record["previous"]
         following = record["following"]
         if following is not None and self._contains(following):
-            # Put the page before its surviving next neighbor.
+            # The page that followed this one is still in history.
             node = dll.append(record["url"], record["metadata"])
             dll.unlink(node)
             prev = following.prev
@@ -92,7 +92,7 @@ class HistoryManager:
             previous.next = node
             dll.size += 1
         else:
-            # Neither neighbor remains, so use the saved index if possible.
+            # Both nearby pages are gone. Use the saved position if it still fits.
             node = dll.append(record["url"], record["metadata"])
             dll.unlink(node)
             insertion_index = min(record["index"], dll.size)

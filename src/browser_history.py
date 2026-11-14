@@ -1,4 +1,4 @@
-"""Browser navigation backed by a doubly linked list."""
+"""Store visited pages in a doubly linked list and track the current page."""
 
 import json
 from pathlib import Path
@@ -63,7 +63,7 @@ class BrowserHistory:
         return {"url": self.current.url, "metadata": self.current.metadata}
 
     def export_txt(self, filename):
-        """Write history and the current cursor to a readable .txt file."""
+        """Save the pages and current position as JSON in a text file."""
         urls = []
         cursor_index = None
         node = self.dll.head
@@ -81,7 +81,7 @@ class BrowserHistory:
         Path(filename).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     def import_txt(self, filename):
-        """Load a history file after checking its format and entries."""
+        """Check a saved history file, then load its pages and current position."""
         payload = json.loads(Path(filename).read_text(encoding="utf-8"))
         if not isinstance(payload, dict) or payload.get("format") != "browser-history-v1":
             raise ValueError("This file is not a supported browser history export")

@@ -1,10 +1,12 @@
 # Browser history manager
 
-A small Python project that models browser history with a doubly linked list. Each page links to the one before and after it, and a cursor tracks the current page. You can navigate, branch from an earlier page, delete and restore pages, and save or load history in a `.txt` file. The project uses Python's standard library.
+This Python program stores browser history in a doubly linked list. Each page has links to the previous and next pages. The cursor keeps track of which page you are on.
+
+You can move through your history, visit a new page after going back, or delete and restore pages. You can also save history to a `.txt` file and load it later. No extra Python packages are needed.
 
 ## Run
 
-Requires Python 3.9 or later.
+Use Python 3.9 or later. Run this command from the project folder:
 
 ```powershell
 python src/main.py
@@ -16,7 +18,7 @@ Enter a homepage when prompted, or press Enter to start at `https://example.com`
 
 | Command | What it does |
 | --- | --- |
-| `visit URL` | Open a page and remove any forward history |
+| `visit URL` | Add a page to history and remove any forward history |
 | `back N` / `forward N` | Move through history, stopping at either end |
 | `current` / `list` | Show the current page or the full list; `[<]` marks the current page |
 | `delete URL` | Delete the first matching URL and add it to the restore stack |
@@ -25,9 +27,13 @@ Enter a homepage when prompted, or press Enter to start at `https://example.com`
 | `export FILE.txt` / `import FILE.txt` | Save or load the pages and cursor position |
 | `quit` | Exit the program |
 
-History holds up to 50 pages by default. When it fills, the oldest page is removed. Deleting the current page moves the cursor to the previous page, or to the next page if the deleted page was first. Restore puts a page before its original next neighbor when that page is still present. Otherwise it places the page after its original previous neighbor. If neither neighbor remains, it uses the saved index, limited to the current list length. Clearing history also clears the restore stack.
+History holds 50 pages by default. Adding another page removes the oldest one.
 
-The `.txt` file contains readable JSON with a `browser-history-v1` format marker, page URLs and metadata, and the current cursor index. Import checks the file before replacing the current history. The receiving browser's capacity applies, so older pages may be dropped during import.
+If you delete the current page, the cursor moves to the previous page. If there is no previous page, it moves to the next one.
+
+Restore brings back the last page you deleted. It goes before the page that originally followed it, if that page is still in history. Otherwise, it goes after the page that originally came before it. If both pages are gone, restore uses the saved position or the end of the list if the list is now shorter. Clearing history also empties the restore stack.
+
+Export saves readable JSON inside the `.txt` file. It includes the `browser-history-v1` format marker, URLs, metadata, and the position of the current page. Import checks these entries before replacing history. If the file has more pages than the browser can hold, import removes the oldest ones.
 
 ## Run the tests
 
@@ -35,4 +41,4 @@ The `.txt` file contains readable JSON with a `browser-history-v1` format marker
 python -m unittest discover -s tests -v
 ```
 
-The tests cover repeated back navigation, branching, capacity limits, deleting and restoring the current page, empty history, and import/export. They also check that import into a smaller history keeps a valid cursor.
+The tests check navigation past the first page, visiting a new page from the middle of history, and removing old pages when history is full. They also cover deleting and restoring a page, clearing history, and saving and loading files. A separate case checks what happens when an imported file has more pages than the browser can hold.
