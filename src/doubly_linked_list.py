@@ -66,3 +66,18 @@ class DoublyLinkedList:
         self.tail = node
         self.size -= removed
         return removed
+
+    def remove_head(self):
+        if self.head is None:
+            return None
+        cur = self.head
+        self.head = cur.next
+
+        if self.head is not None:
+            self.head.prev=None
+        else:
+            self.tail = None
+
+        cur.next=None
+        self.size-=1
+        return cur
