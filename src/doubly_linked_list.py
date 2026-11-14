@@ -1,10 +1,13 @@
+from node import Node
+
+
 class DoublyLinkedList:
     def __init__(self):
         self.head = None
         self.tail = None
         self.size = 0
 
-    def append(self, url, metadata):
+    def append(self, url, metadata=None):
         new_node = Node(url, metadata)
         if self.head is None:
             self.head = new_node
@@ -81,3 +84,8 @@ class DoublyLinkedList:
         cur.next=None
         self.size-=1
         return cur
+
+    def clear(self):
+        self.head = None
+        self.tail = None
+        self.size = 0 
