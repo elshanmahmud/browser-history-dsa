@@ -1,6 +1,6 @@
-# Browser History Project
+# Browser history manager
 
-A command-line browser history manager built with a from-scratch doubly linked list. It supports back/forward navigation, branching, a configurable capacity, delete/restore, and readable text-file import/export. It uses only the Python standard library.
+A small Python project that models browser history with a doubly linked list. Each page links to the one before and after it, and a cursor tracks the current page. You can navigate, branch from an earlier page, delete and restore pages, and save or load history in a `.txt` file. The project uses Python's standard library.
 
 ## Run
 
@@ -10,29 +10,29 @@ Requires Python 3.9 or later.
 python src/main.py
 ```
 
-At the prompt, enter a homepage or press Enter for `https://example.com`. Type `help` to see the command list.
+Enter a homepage when prompted, or press Enter to start at `https://example.com`. Type `help` to see the commands.
 
 ## Commands
 
-| Command | Action |
+| Command | What it does |
 | --- | --- |
-| `visit URL` | Visit a page and discard forward history |
-| `back N` / `forward N` | Move by N pages; movement stops at either end |
-| `current` / `list` | Show the current page or all pages (`[<]` marks the cursor) |
-| `delete URL` | Delete the first matching URL and save it for restoration |
-| `restore` | Restore the most recently deleted page |
-| `clear` | Clear pages and the restore stack |
-| `export FILE.txt` / `import FILE.txt` | Save or load history and cursor position |
-| `quit` | Exit |
+| `visit URL` | Open a page and remove any forward history |
+| `back N` / `forward N` | Move through history, stopping at either end |
+| `current` / `list` | Show the current page or the full list; `[<]` marks the current page |
+| `delete URL` | Delete the first matching URL and add it to the restore stack |
+| `restore` | Bring back the most recently deleted page |
+| `clear` | Empty history and the restore stack |
+| `export FILE.txt` / `import FILE.txt` | Save or load the pages and cursor position |
+| `quit` | Exit the program |
 
-The default history capacity is 50. When capacity is exceeded, the oldest page is removed. If deleting the current page, the cursor moves to its previous page, or to its next page if there is no previous page. Restoring inserts the page before its surviving original next neighbor, otherwise after its surviving previous neighbor. If both are gone, it uses the saved index, clamped to the current list. Restoring does not change the cursor unless the list had no current page.
+History holds up to 50 pages by default. When it fills, the oldest page is removed. Deleting the current page moves the cursor to the previous page, or to the next page if the deleted page was first. Restore puts a page before its original next neighbor when that page is still present. Otherwise it places the page after its original previous neighbor. If neither neighbor remains, it uses the saved index, limited to the current list length. Clearing history also clears the restore stack.
 
-The `.txt` export contains readable, indented JSON with a `browser-history-v1` format marker, URL/metadata entries, and the cursor index. Import validates the file before replacing the current history. The receiving instance's capacity applies; oldest entries are pruned when needed.
+The `.txt` file contains readable JSON with a `browser-history-v1` format marker, page URLs and metadata, and the current cursor index. Import checks the file before replacing the current history. The receiving browser's capacity applies, so older pages may be dropped during import.
 
-## Test
+## Run the tests
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-The suite covers back 100 times on two pages, branching, capacity pruning, deleting/restoring the current page, empty-history behavior, and import/export round trips.
+The tests cover repeated back navigation, branching, capacity limits, deleting and restoring the current page, empty history, and import/export. They also check that import into a smaller history keeps a valid cursor.

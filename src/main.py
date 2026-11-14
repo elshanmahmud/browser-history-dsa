@@ -1,4 +1,4 @@
-"""Interactive command loop for the browser history project."""
+"""Command-line interface for browser history."""
 
 from browser_history import BrowserHistory
 from history_manager import HistoryManager
@@ -8,7 +8,7 @@ def run():
     homepage = input("Homepage URL [https://example.com]: ").strip() or "https://example.com"
     browser = BrowserHistory(homepage)
     manager = HistoryManager(browser)
-    print("Browser History Manager. Type 'help' to see commands.")
+    print("Browser history. Type 'help' to see the commands.")
     while True:
         command = input("\nhistory> ").strip()
         if not command:
@@ -40,7 +40,7 @@ def run():
                 if not argument:
                     print("Usage: delete URL")
                 elif not manager.delete_url(argument):
-                    print(f"URL '{argument}' not found in history.")
+                    print(f"No history entry found for '{argument}'.")
             elif action == "restore":
                 manager.restore_node()
             elif action in {"clear", "delete-all"}:
@@ -59,9 +59,9 @@ def run():
                     manager.restore_stack.clear()
                     print(f"History imported from {argument}")
             else:
-                print("Unknown command. Type 'help' for commands.")
+                print("I don't know that command. Type 'help' to see the commands.")
         except (ValueError, OSError) as error:
-            print(f"Could not complete command: {error}")
+            print(f"Error: {error}")
 
 
 if __name__ == "__main__":

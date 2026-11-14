@@ -1,4 +1,4 @@
-"""Browser navigation state backed by the project's doubly linked list."""
+"""Browser navigation backed by a doubly linked list."""
 
 import json
 from pathlib import Path
@@ -63,7 +63,7 @@ class BrowserHistory:
         return {"url": self.current.url, "metadata": self.current.metadata}
 
     def export_txt(self, filename):
-        """Save history as readable JSON text in the requested .txt file."""
+        """Write history and the current cursor to a readable .txt file."""
         urls = []
         cursor_index = None
         node = self.dll.head
@@ -81,26 +81,26 @@ class BrowserHistory:
         Path(filename).write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     def import_txt(self, filename):
-        """Replace history from a file produced by export_txt; reject invalid input."""
+        """Load a history file after checking its format and entries."""
         payload = json.loads(Path(filename).read_text(encoding="utf-8"))
         if not isinstance(payload, dict) or payload.get("format") != "browser-history-v1":
-            raise ValueError("Unsupported browser history file format")
+            raise ValueError("This file is not a supported browser history export")
         items = payload.get("history")
         cursor_index = payload.get("current_index")
         if not isinstance(items, list):
-            raise ValueError("History must be a list")
+            raise ValueError("History entries must be stored in a list")
         if not items:
             if cursor_index is not None:
-                raise ValueError("An empty history must have a null current_index")
+                raise ValueError("An empty history must have a null current index")
         elif not isinstance(cursor_index, int) or isinstance(cursor_index, bool) or not 0 <= cursor_index < len(items):
-            raise ValueError("current_index is outside the history")
+            raise ValueError("The current index is outside the history")
         for item in items:
             if not isinstance(item, dict) or not isinstance(item.get("url"), str):
-                raise ValueError("Each history entry must contain a URL string")
+                raise ValueError("Each history entry needs a URL string")
 
         self.dll.clear()
         self.current = None
-        # The destination instance's capacity remains authoritative.
+        # Keep this browser's capacity when loading a file.
         for item in items:
             self.dll.append(item["url"], item.get("metadata"))
         while self.dll.size > self.capacity:

@@ -1,15 +1,14 @@
-"""History display, deletion, and LIFO restoration helpers."""
+"""Display browser history and manage deleted pages."""
 
 
 class HistoryManager:
     def __init__(self, browser_history_instance):
         self.browser = browser_history_instance
-        # Each entry keeps the original neighbors so restore can return a page
-        # to its former position whenever at least one neighbor still exists.
+        # Keep each deleted page's neighbors and index for restoration.
         self.restore_stack = []
 
     def display_history(self):
-        """Return readable rows and print them for compatibility with the demo."""
+        """Print the history and return the lines that were shown."""
         rows = []
         node = self.browser.dll.head
         while node is not None:
@@ -17,8 +16,8 @@ class HistoryManager:
             rows.append(f"URL: {node.url} | Metadata: {node.metadata!r}{marker}")
             node = node.next
         if not rows:
-            rows = ["Browsing history is empty."]
-        print("\nCurrent Browsing History")
+            rows = ["No pages in history."]
+        print("\nBrowsing history")
         print("\n".join(rows))
         print("------------------------------\n")
         return rows
@@ -27,7 +26,7 @@ class HistoryManager:
         self.browser.dll.clear()
         self.browser.current = None
         self.restore_stack.clear()
-        print("Entire browsing history has been deleted.")
+        print("History cleared.")
 
     def delete_url(self, target_url):
         node = self.browser.dll.head
@@ -49,7 +48,7 @@ class HistoryManager:
         if node is self.browser.current:
             self.browser.current = previous or following
         self.browser.dll.unlink(node)
-        print(f"URL '{target_url}' deleted and saved for restore.")
+        print(f"Deleted '{target_url}'. You can restore it.")
         return True
 
     def _contains(self, target):
@@ -71,7 +70,7 @@ class HistoryManager:
         previous = record["previous"]
         following = record["following"]
         if following is not None and self._contains(following):
-            # Insert directly before the surviving next neighbor.
+            # Put the page before its surviving next neighbor.
             node = dll.append(record["url"], record["metadata"])
             dll.unlink(node)
             prev = following.prev
@@ -93,8 +92,7 @@ class HistoryManager:
             previous.next = node
             dll.size += 1
         else:
-            # Both original neighbors are gone: restore at the saved index,
-            # clamped to the current list length.
+            # Neither neighbor remains, so use the saved index if possible.
             node = dll.append(record["url"], record["metadata"])
             dll.unlink(node)
             insertion_index = min(record["index"], dll.size)
@@ -125,5 +123,5 @@ class HistoryManager:
                 self.browser.current = dll.head
         if self.browser.current is None:
             self.browser.current = node
-        print(f"Restored URL '{record['url']}' to its prior position when possible.")
+        print(f"Restored '{record['url']}' near its old position.")
         return True
