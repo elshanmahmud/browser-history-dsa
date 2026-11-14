@@ -42,12 +42,11 @@ class DoublyLinkedList:
 
         node.prev = None
         node.next = None
-
         self.size -=1
         return node
 
     def cut_after(self, node):
-        if self.head is None or node is None:
+        if node is None:
             return 0
 
         valid_node = self.head
@@ -55,7 +54,7 @@ class DoublyLinkedList:
             valid_node = valid_node.next
         if valid_node is None:
             return 0
-
+        
         current = node.next
         removed = 0
         while current is not None:
@@ -81,11 +80,18 @@ class DoublyLinkedList:
         else:
             self.tail = None
 
+        cur.prev=None
         cur.next=None
         self.size-=1
         return cur
 
     def clear(self):
+        cur = self.head
+        while cur is not None:
+            next_node = cur.next
+            cur.prev = None
+            cur.next = None
+            cur = next_node
         self.head = None
         self.tail = None
         self.size = 0 
